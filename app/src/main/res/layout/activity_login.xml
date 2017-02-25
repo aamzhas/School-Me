@@ -11,62 +11,71 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <EditText
+        android:id="@+id/password"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="textPassword"
-        android:ems="10"
-        android:layout_marginTop="51dp"
-        android:id="@+id/password"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:hint="Enter Password" />
+        android:layout_marginTop="51dp"
+        android:ems="10"
+        android:hint="Enter Password"
+        android:inputType="textPassword" />
 
     <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:inputType="textEmailAddress"
-        android:ems="10"
         android:id="@+id/email"
-        android:hint="Enter E-mail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_above="@+id/password"
-        android:layout_alignStart="@+id/TV_password" />
+        android:layout_alignStart="@+id/TV_password"
+        android:ems="10"
+        android:hint="Enter E-mail"
+        android:inputType="textEmailAddress" />
 
     <TextView
-        android:text="Password:"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/TV_password"
-        android:layout_marginBottom="36dp"
-        android:layout_alignBottom="@+id/password"
-        android:layout_alignStart="@+id/password" />
-
-    <TextView
-        android:text="E-mail ID:"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/password"
+        android:layout_alignStart="@+id/password"
+        android:layout_marginBottom="36dp"
+        android:text="Password:" />
+
+    <TextView
         android:id="@+id/TV_email"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_above="@+id/password"
         android:layout_alignStart="@+id/email"
-        android:layout_marginBottom="34dp" />
+        android:layout_marginBottom="34dp"
+        android:text="E-mail ID:" />
 
     <Button
-        android:text="Login"
+        android:id="@+id/B_login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/B_login"
+        android:layout_alignStart="@+id/password"
+        android:layout_below="@+id/password"
         android:layout_marginTop="28dp"
         android:onClick="login"
-        android:layout_below="@+id/password"
-        android:layout_alignStart="@+id/password" />
+        android:text="Login" />
 
     <Button
-        android:text="Sign Up"
+        android:id="@+id/B_signUp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/B_signUp"
-        android:onClick="signup"
         android:layout_alignBaseline="@+id/B_login"
         android:layout_alignBottom="@+id/B_login"
-        android:layout_alignEnd="@+id/password" />
+        android:layout_alignEnd="@+id/password"
+        android:onClick="signup"
+        android:text="Sign Up" />
+
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/sign_in_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="39dp"
+        android:onClick="signInWithGoogle" />
 
 </RelativeLayout>

@@ -3,4 +3,6 @@
 
     <string name="alertDialog">Alert!</string>
     <string name="ok">Ok</string>
+    <string name="success">Success!</string>
+    <string name="failed">Authentication Failed</string>
 </resources>

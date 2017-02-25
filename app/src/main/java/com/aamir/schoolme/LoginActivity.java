@@ -1,27 +1,43 @@
 package com.aamir.schoolme;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 
-public class LoginActivity extends Activity {
+public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
+    private static final int RC_SIGN_IN = 960;
     final String AUTHORIZATION_TAG = "Authorization";
+    final String GOOGLE_SIGNIN_TAG = "Google Signin";
+
+    //Google Services
+    private GoogleApiClient mGoogleApiClient;
+
+    //variables for firebase authorization
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListner;
+    private FirebaseUser user;
 
     private EditText email;
     private EditText password;
@@ -32,6 +48,18 @@ public class LoginActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        //Google sign in
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .build();
+
+        //Google Services setup
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, this)
+                .addApi(Auth.GOOGLE_SIGN_IN_API)
+                .build();
+
         //Initialising Firebase Auth and Listener Objects
         mAuth = FirebaseAuth.getInstance();
         mAuthListner = new FirebaseAuth.AuthStateListener() {
@@ -40,6 +68,8 @@ public class LoginActivity extends Activity {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     Log.d(AUTHORIZATION_TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+                    user = FirebaseAuth.getInstance().getCurrentUser();
+
                 } else {
                     Log.d(AUTHORIZATION_TAG, "onAuthStateChanged:signed_out");
                 }
@@ -50,14 +80,25 @@ public class LoginActivity extends Activity {
         email = (EditText) findViewById(R.id.email);
         password = (EditText) findViewById(R.id.password);
 
+        SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
+        signInButton.setSize(SignInButton.SIZE_STANDARD);
+
+
+
     }
 
-    public void getUserDetails() {
-        
+    /**
+     * Method to return the name of current user
+     */
+    public void getUserName() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            String name = user.getDisplayName();
+        }
     }
     /**
      * Method executed when login button is clicked
-     * @param view
+     * @param view - current view
      */
     public void login(View view) {
         mAuth.createUserWithEmailAndPassword(email.getText().toString(), password.getText().toString())
@@ -67,18 +108,64 @@ public class LoginActivity extends Activity {
                         Log.d(AUTHORIZATION_TAG, "createUserWithEmail:onComplete:" + task.isSuccessful());
 
                         if (!task.isSuccessful()) {
-                            displayDialog("Authentication Failed");
+                            displayDialog(getString(R.string.alertDialog), getString(R.string.failed));
 
                         }
                     }
                 });
+    }
 
+    public void signInWithGoogle(View view) {
+        signIn();
+    }
 
+    public void signOut() {
+        displayDialog(getString(R.string.success), "Signed out");
+    }
+
+    private void signIn() {
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RC_SIGN_IN) {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+
+            if (result.isSuccess()) {
+                GoogleSignInAccount account = result.getSignInAccount();
+                firebaseAuthWithGoogle(account);
+                displayDialog(getString(R.string.success), account.getDisplayName());
+            } else {
+                displayDialog(getString(R.string.alertDialog), getString(R.string.failed));
+            }
+        }
+    }
+
+    private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
+        Log.d(AUTHORIZATION_TAG, "firebaseWithGoogle:" + account.getId());
+
+        AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        Log.d(AUTHORIZATION_TAG, "createUserWithCredential:onComplete:" + task.isSuccessful());
+
+                        if (!task.isSuccessful()) {
+                            displayDialog(getString(R.string.alertDialog), getString(R.string.failed));
+
+                    }
+                    }
+                });
     }
 
     /**
      * Method executed when signup button is clicked
-     * @param view
+     * @param view - current View
      */
     public void signup(View view) {
         mAuth.signInWithEmailAndPassword(email.getText().toString(), password.getText().toString())
@@ -89,7 +176,7 @@ public class LoginActivity extends Activity {
 
                         if (!task.isSuccessful()) {
                             Log.w(AUTHORIZATION_TAG, "signInWithEmail", task.getException());
-                            displayDialog("Authentication Failed");
+                            displayDialog(getString(R.string.alertDialog), getString(R.string.failed));
 
                         }
                     }
@@ -103,14 +190,14 @@ public class LoginActivity extends Activity {
      * Method to generate Alert Dialog showing a message
      * @param message - message to be displayed
      */
-    public void displayDialog(String message) {
+    public void displayDialog(String title, String message) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(message);
-        builder.setTitle(R.string.alertDialog);
+        builder.setTitle(title);
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                return;
+                //return;
             }
         });
 
@@ -138,4 +225,8 @@ public class LoginActivity extends Activity {
     }
 
 
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.e(GOOGLE_SIGNIN_TAG, "signInWithGoogle" + connectionResult.getErrorMessage());
+    }
 }
