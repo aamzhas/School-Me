@@ -3,6 +3,7 @@ package com.aamir.schoolme;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -30,7 +31,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private static final int RC_SIGN_IN = 960;
     final String AUTHORIZATION_TAG = "Authorization";
     final String GOOGLE_SIGNIN_TAG = "Google Signin";
-
+    SharedPreferences mSharedPreferences;
+    SharedPreferences.Editor mSharefPreferencesEditor;
     //Google Services
     private GoogleApiClient mGoogleApiClient;
 
@@ -47,6 +49,9 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         //setting up display
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        mSharedPreferences = getSharedPreferences(getString(R.string.PreferencesFile), 0);
+        mSharefPreferencesEditor = mSharedPreferences.edit();
 
         //Google sign in
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -83,8 +88,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
         signInButton.setSize(SignInButton.SIZE_STANDARD);
 
-
-
     }
 
     /**
@@ -110,9 +113,16 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                         if (!task.isSuccessful()) {
                             displayDialog(getString(R.string.alertDialog), getString(R.string.failed));
 
+                        } else {
+                            changeLoginState(true);
                         }
                     }
                 });
+    }
+
+    public void changeLoginState(boolean state) {
+        mSharefPreferencesEditor.putBoolean(getString(R.string.Pref_login), state);
+        mSharefPreferencesEditor.commit();
     }
 
     public void signInWithGoogle(View view) {
@@ -120,6 +130,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     }
 
     public void signOut() {
+        changeLoginState(false);
         displayDialog(getString(R.string.success), "Signed out");
     }
 
@@ -139,6 +150,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 GoogleSignInAccount account = result.getSignInAccount();
                 firebaseAuthWithGoogle(account);
                 displayDialog(getString(R.string.success), account.getDisplayName());
+                changeLoginState(true);
             } else {
                 displayDialog(getString(R.string.alertDialog), getString(R.string.failed));
             }
@@ -157,8 +169,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
                         if (!task.isSuccessful()) {
                             displayDialog(getString(R.string.alertDialog), getString(R.string.failed));
-
-                    }
+                        }
                     }
                 });
     }
@@ -178,13 +189,14 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                             Log.w(AUTHORIZATION_TAG, "signInWithEmail", task.getException());
                             displayDialog(getString(R.string.alertDialog), getString(R.string.failed));
 
+                        } else {
+                            changeLoginState(true);
                         }
                     }
                 });
 
 
     }
-
 
     /**
      * Method to generate Alert Dialog showing a message
