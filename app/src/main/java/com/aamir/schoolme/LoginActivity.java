@@ -91,6 +91,27 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     }
 
     /**
+     * Method invoked when activity starts. Adding authorization listener from authorization object
+     */
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener( mAuthListner );
+    }
+
+    /**
+     * Method invoked when activity stops. Removing authorization listener from authorization
+     * object
+     */
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if ( mAuthListner != null ) {
+            mAuth.removeAuthStateListener( mAuthListner );
+        }
+    }
+
+    /**
      * Method to return the name of current user
      */
     public void getUserName() {
@@ -99,6 +120,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             String name = user.getDisplayName();
         }
     }
+
     /**
      * Method executed when login button is clicked
      * @param view - current view
@@ -120,23 +142,51 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 });
     }
 
+    /**
+     * Method to generate Alert Dialog showing a message
+     *
+     * @param message - message to be displayed
+     */
+    public void displayDialog( String title, String message ) {
+        AlertDialog.Builder builder = new AlertDialog.Builder( this );
+        builder.setMessage( message );
+        builder.setTitle( title );
+        builder.setPositiveButton( R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick( DialogInterface dialog, int which ) {
+                //return;
+            }
+        } );
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    /**
+     * Method to change the Login Attribute in SharedPreferences
+     * @param state - new state
+     */
     public void changeLoginState(boolean state) {
         mSharefPreferencesEditor.putBoolean(getString(R.string.Pref_login), state);
         mSharefPreferencesEditor.commit();
     }
 
+    /**
+     * OnClick for signing in using google
+     * @param view -
+     */
     public void signInWithGoogle(View view) {
         signIn();
     }
 
-    public void signOut() {
-        changeLoginState(false);
-        displayDialog(getString(R.string.success), "Signed out");
-    }
-
     private void signIn() {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInIntent, RC_SIGN_IN);
+        startActivityForResult(signInIntent, RC_SIGN_IN );
+    }
+
+    public void signOut() {
+        changeLoginState( false );
+        displayDialog( getString( R.string.success ), "Signed out");
     }
 
     @Override
@@ -197,45 +247,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
 
     }
-
-    /**
-     * Method to generate Alert Dialog showing a message
-     * @param message - message to be displayed
-     */
-    public void displayDialog(String title, String message) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(message);
-        builder.setTitle(title);
-        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                //return;
-            }
-        });
-
-        AlertDialog dialog = builder.create();
-        dialog.show();
-    }
-    /**
-     * Method invoked when activity starts. Adding authorization listener from authorization object
-     */
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mAuth.addAuthStateListener(mAuthListner);
-    }
-
-    /**
-     * Method invoked when activity stops. Removing authorization listener from authorization object
-     */
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (mAuthListner != null) {
-            mAuth.removeAuthStateListener(mAuthListner);
-        }
-    }
-
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
