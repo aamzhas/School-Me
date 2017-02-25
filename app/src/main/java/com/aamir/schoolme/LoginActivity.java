@@ -6,8 +6,6 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 
@@ -22,6 +20,7 @@ public class LoginActivity extends Activity {
     final String AUTHORIZATION_TAG = "Authorization";
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListner;
+    private FirebaseUser user;
 
     private EditText email;
     private EditText password;
@@ -40,6 +39,8 @@ public class LoginActivity extends Activity {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     Log.d(AUTHORIZATION_TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+                    user = FirebaseAuth.getInstance().getCurrentUser();
+
                 } else {
                     Log.d(AUTHORIZATION_TAG, "onAuthStateChanged:signed_out");
                 }
@@ -52,12 +53,18 @@ public class LoginActivity extends Activity {
 
     }
 
-    public void getUserDetails() {
-        
+    /**
+     * Method to return the name of current user
+     */
+    public void getUserName() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            String name = user.getDisplayName();
+        }
     }
     /**
      * Method executed when login button is clicked
-     * @param view
+     * @param view - current view
      */
     public void login(View view) {
         mAuth.createUserWithEmailAndPassword(email.getText().toString(), password.getText().toString())
@@ -72,13 +79,34 @@ public class LoginActivity extends Activity {
                         }
                     }
                 });
-
-
     }
+
+    /*
+    private void firebaseAuthorizationWithGoogle(GoogleSignInAccount acct) {
+        Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
+
+        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
+
+                        // If sign in fails, display a message to the user. If sign in succeeds
+                        // the auth state listener will be notified and logic to handle the
+                        // signed in user can be handled in the listener.
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "signInWithCredential", task.getException());
+                            displayDialog("Authentication Failed");
+                        }
+                        // ...
+                    }
+                });
+    }*/
 
     /**
      * Method executed when signup button is clicked
-     * @param view
+     * @param view - current View
      */
     public void signup(View view) {
         mAuth.signInWithEmailAndPassword(email.getText().toString(), password.getText().toString())
@@ -110,7 +138,7 @@ public class LoginActivity extends Activity {
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                return;
+                //return;
             }
         });
 
