@@ -54,7 +54,7 @@ public class ListViewCustomAdapter extends BaseAdapter {
 
 		viewHolder.name.setText( cources.get( position ).getName() );
 		viewHolder.code.setText( cources.get( position ).getCode() );
-		row.setTag( cources.get( position ).getName() );
+		row.setTag( cources.get( position ).getCode() );
 		return row;
 	}
 

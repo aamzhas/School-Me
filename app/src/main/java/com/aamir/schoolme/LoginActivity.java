@@ -25,6 +25,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
 
@@ -33,6 +35,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     final String GOOGLE_SIGNIN_TAG = "Google Signin";
     SharedPreferences mSharedPreferences;
     SharedPreferences.Editor mSharefPreferencesEditor;
+
     //Google Services
     private GoogleApiClient mGoogleApiClient;
 
@@ -40,6 +43,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListner;
     private FirebaseUser user;
+    private FirebaseDatabase database;
+    private DatabaseReference reference;
 
     private EditText email;
     private EditText password;
@@ -50,20 +55,29 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        if ( getParent() != null ) {
+            getParent().finish();
+        }
+
         mSharedPreferences = getSharedPreferences(getString(R.string.PreferencesFile), 0);
         mSharefPreferencesEditor = mSharedPreferences.edit();
 
         //Google sign in
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
                 .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .requestProfile()
                 .build();
 
         //Google Services setup
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this, this)
-                .addApi(Auth.GOOGLE_SIGN_IN_API)
+                .addApi( Auth.GOOGLE_SIGN_IN_API, gso )
                 .build();
+
+        //initializing database objects
+        database = FirebaseDatabase.getInstance();
+        reference = database.getReference();
 
         //Initialising Firebase Auth and Listener Objects
         mAuth = FirebaseAuth.getInstance();
@@ -233,6 +247,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     public void goToNextActivity() {
         Intent nextActivity = new Intent( this, AllClassesList.class );
         startActivity( nextActivity );
+        finish();
     }
 
     @Override
@@ -245,9 +260,10 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             if (result.isSuccess()) {
                 GoogleSignInAccount account = result.getSignInAccount();
                 firebaseAuthWithGoogle(account);
-                displayDialog(getString(R.string.success), account.getDisplayName());
-                goToNextActivity();
+                //displayDialog(getString(R.string.success), account.getDisplayName());
+                addNewUser( account.getEmail(), account.getGivenName(), account.getId(), account.getDisplayName() );
                 changeLoginState(true);
+                goToNextActivity();
             } else {
                 displayDialog(getString(R.string.alertDialog), getString(R.string.failed));
             }
@@ -257,7 +273,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
         Log.d(AUTHORIZATION_TAG, "firebaseWithGoogle:" + account.getId());
 
-        AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
+        AuthCredential credential = GoogleAuthProvider.getCredential( account.getIdToken(), null );
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -269,6 +285,11 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                         }
                     }
                 });
+    }
+
+    private void addNewUser( String email, String name, String id, String username ) {
+        User user = new User( email, username, name, id );
+        reference.child( "users" ).child( username ).setValue( user );
     }
 
     @Override

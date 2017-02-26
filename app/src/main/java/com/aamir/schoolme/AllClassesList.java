@@ -11,12 +11,17 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class AllClassesList extends AppCompatActivity implements View.OnClickListener, ListView.OnItemClickListener {
 
-	ListView courcesListView;
+	private ListView courcesListView;
+	private FirebaseDatabase database;
+	private DatabaseReference reference;
 
 	@RequiresApi ( api = Build.VERSION_CODES.M )
 	@Override
@@ -25,6 +30,11 @@ public class AllClassesList extends AppCompatActivity implements View.OnClickLis
 		setContentView( R.layout.activity_all_classes_list );
 		Toolbar toolbar = (Toolbar) findViewById( R.id.toolbar );
 		setSupportActionBar( toolbar );
+
+		database = FirebaseDatabase.getInstance();
+		reference = database.getReference( "message" );
+
+
 
 		FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById( R.id.fab );
 		floatingActionButton.setImageResource( R.mipmap.ic_add_white_24dp );
@@ -35,6 +45,9 @@ public class AllClassesList extends AppCompatActivity implements View.OnClickLis
 		ArrayList< Course > course = new ArrayList<>();
 		course.add( new Course( "Programming Software Studio", "CS 126", 4, new HashMap< String, String >(), 3.0 ) );
 		course.add( new Course( "Computer Systems and Programming", "ECE 220", 3, new HashMap< String, String >(), 2.5 ) );
+		course.add( new Course( "Data Structures", "CS 225", 4, new HashMap< String, String >(), 2.5 ) );
+		course.add( new Course( "Analog Signal Processing", "ECE 210", 3, new HashMap< String, String >(), 2 ) );
+		course.add( new Course( "Introduction to Theatre", "THEA 101", 5, new HashMap< String, String >(), 3.5 ) );
 
 		courcesListView = (ListView) findViewById( R.id.LV_courses );
 		courcesListView.setAdapter( new ListViewCustomAdapter( this, course ) );
@@ -63,5 +76,10 @@ public class AllClassesList extends AppCompatActivity implements View.OnClickLis
 		intent.putExtra( "current_course", parent.getChildAt( position ).getTag().toString() );
 		startActivity( intent );
 
+	}
+
+	@Override
+	public void onBackPressed() {
+		System.exit( 0 );
 	}
 }
