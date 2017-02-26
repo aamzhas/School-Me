@@ -4,70 +4,59 @@
     android:id="@+id/content_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:focusable="true"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <EditText
-        android:id="@+id/password"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/Parent_Email"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/Parent_Password"
+        android:layout_alignParentStart="true"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/TV_email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="E-mail ID:" />
+
+        <EditText
+            android:id="@+id/email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Enter E-mail"
+            android:inputType="textEmailAddress" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/Parent_Password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
-        android:layout_marginTop="51dp"
-        android:ems="10"
-        android:hint="Enter Password"
-        android:inputType="textPassword" />
+        android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/email"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/password"
-        android:layout_alignStart="@+id/TV_password"
-        android:ems="10"
-        android:hint="Enter E-mail"
-        android:inputType="textEmailAddress" />
+        <TextView
+            android:id="@+id/TV_password"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Password:" />
 
-    <TextView
-        android:id="@+id/TV_password"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/password"
-        android:layout_alignStart="@+id/password"
-        android:layout_marginBottom="36dp"
-        android:text="Password:" />
+        <EditText
+            android:id="@+id/password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Enter Password"
+            android:inputType="textPassword" />
+    </LinearLayout>
 
-    <TextView
-        android:id="@+id/TV_email"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/password"
-        android:layout_alignStart="@+id/email"
-        android:layout_marginBottom="34dp"
-        android:text="E-mail ID:" />
-
-    <Button
-        android:id="@+id/B_login"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/password"
-        android:layout_below="@+id/password"
-        android:layout_marginTop="28dp"
-        android:onClick="login"
-        android:text="Login" />
-
-    <Button
-        android:id="@+id/B_signUp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/B_login"
-        android:layout_alignBottom="@+id/B_login"
-        android:layout_alignEnd="@+id/password"
-        android:onClick="signup"
-        android:text="Sign Up" />
 
     <com.google.android.gms.common.SignInButton
         android:id="@+id/sign_in_button"
@@ -75,7 +64,27 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="39dp"
-        android:onClick="signInWithGoogle" />
+        android:layout_marginBottom="38dp" />
+
+    <Button
+        android:id="@+id/B_login"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/B_signUp"
+        android:layout_alignBottom="@+id/B_signUp"
+        android:layout_toEndOf="@+id/sign_in_button"
+        android:onClick="onClick"
+        android:text="Login" />
+
+    <Button
+        android:id="@+id/B_signUp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/Parent_Password"
+        android:layout_marginTop="37dp"
+        android:layout_toStartOf="@+id/sign_in_button"
+        android:onClick="onClick"
+        android:text="Sign Up" />
+
 
 </RelativeLayout>

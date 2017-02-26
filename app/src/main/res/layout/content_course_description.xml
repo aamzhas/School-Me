@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/content_all_classes_list"
+    android:id="@+id/content_course_description"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingBottom="@dimen/activity_vertical_margin"
@@ -10,15 +10,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.aamir.schoolme.AllClassesList"
-    tools:showIn="@layout/activity_all_classes_list">
+    tools:context="com.aamir.schoolme.CourseDescription"
+    tools:showIn="@layout/app_bar_course_description">
 
-    <ListView
-        android:id="@+id/LV_courses"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:divider="@color/transparent"
-        android:dividerHeight="10dp" />
 </RelativeLayout>

@@ -18,8 +18,7 @@ public class SpashScreen extends AppCompatActivity {
         boolean loggedIn = mSharedPreferences.getBoolean(getString(R.string.Pref_login), false);
 
         if (loggedIn) {
-            //TO-DO: Add proper activity
-            nextActivity = new Intent(this, LoginActivity.class);
+            nextActivity = new Intent( this, AllClassesList.class );
         } else {
             nextActivity = new Intent(this, LoginActivity.class);
         }

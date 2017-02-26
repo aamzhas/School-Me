@@ -29,6 +29,10 @@
         <activity
             android:name=".AllClassesList"
             android:label="@string/title_activity_all_classes_list"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".CourseDescription"
+            android:label="@string/title_activity_course_description"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
